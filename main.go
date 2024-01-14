@@ -13,7 +13,8 @@ type User struct {
 }
 
 func main() {
-	fmt.Println(tokenizer.Tokenize("Tokenize this bro!"))
+	fmt.Println(tokenizer.Tokenize("Tokenize this bro! testing what's beyond ok?"))
+
 	http.HandleFunc("/", makeAPIFunc(handleHome))
 	http.HandleFunc("/api/user", makeAPIFunc(handleUser))
 	http.ListenAndServe(":3000", nil)
