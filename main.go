@@ -13,7 +13,7 @@ type User struct {
 }
 
 func main() {
-	fmt.Println(tokenizer.Tokenize("Tokenize this bro! testing what's beyond ok?"))
+	fmt.Println(tokenizer.Tokenize("Tokenize this bro! testing what's beyond punctuation..."))
 
 	http.HandleFunc("/", makeAPIFunc(handleHome))
 	http.HandleFunc("/api/user", makeAPIFunc(handleUser))
