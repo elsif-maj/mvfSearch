@@ -33,7 +33,8 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	queryResult, err := conn.Query(context.Background(), "select * from public.\"Snippets\"")
+	queryResult, err := conn.Query(context.Background(), "select * from \"Snippets\"")
+	// queryResult, err := conn.Query(context.Background(), "select * from public.\"Snippets\"")
 	if err != nil {
 		log.Fatal("Error with DB Query: ", err)
 	}
