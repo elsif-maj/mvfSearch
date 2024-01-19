@@ -39,6 +39,7 @@ func main() {
 		log.Fatal("Error with DB Query: ", err)
 	}
 
+	// Clean this up tomorrow
 	var col2, col3, col4 string
 	var col1, col5 int
 	var col6, col7 time.Time
