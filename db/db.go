@@ -4,49 +4,43 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/jackc/pgx/v5"
+
+	"github.com/elsif-maj/umbraSearch/models"
 )
 
-/*
-Things to eventually change about the inherited schema:
-  - Relation names/titles that feature uppercase letters are against best practice and necessiate using quotation marks to specify the table in all queries.
-  - There is a mix of camelCase and snake_case in the column names below
-*/
-type Snippet struct {
-	id         int
-	title      string
-	language   string
-	code       string
-	userId     string
-	created_at time.Time
-	updatedAt  time.Time
-}
-
 func ConnectDB() (*pgx.Conn, error) {
-	db, err := pgx.Connect(context.Background(), os.Getenv("DB_CONN_STR"))
+	conn, err := pgx.Connect(context.Background(), os.Getenv("DB_CONN_STR"))
 	if err != nil {
 		return nil, fmt.Errorf("Unable to connect to database: %v", err)
 	}
 
-	return db, nil
+	fmt.Println("Database connection established")
+	return conn, nil
 }
 
-// queryResult, err := db.Query(context.Background(), "select * from \"Snippets\"")
-// if err != nil {
-// 	log.Fatal("Error with DB Query: ", err)
-// }
+// Do I need to return an error here?
+func GetAllSnippets(db *pgx.Conn) ([]models.Snippet, error) {
+	queryResult, err := db.Query(context.Background(), "select * from \"Snippets\"")
+	if err != nil {
+		return nil, fmt.Errorf("Error with DB Query: %v", err)
+	}
 
-// var allSnippets = []Snippet{}
+	if queryResult == nil {
+		return nil, fmt.Errorf("queryResult is nil")
+	}
 
-// for queryResult.Next() {
-// 	var s Snippet
-// 	err = queryResult.Scan(&s.id, &s.title, &s.language, &s.code, &s.userId, &s.created_at, &s.updatedAt)
-// 	if err != nil {
-// 		fmt.Println("Problem with queryResult.Scan() step: ", err)
-// 	}
-// 	allSnippets = append(allSnippets, s)
-// }
+	var allSnippets = []models.Snippet{}
 
-// fmt.Println(allSnippets[len(allSnippets)-1])
+	for queryResult.Next() {
+		var s models.Snippet
+		err = queryResult.Scan(&s.Id, &s.Title, &s.Language, &s.Code, &s.UserId, &s.Created_at, &s.UpdatedAt)
+		if err != nil {
+			return nil, fmt.Errorf("Problem with queryResult.Scan() step: %v", err)
+		}
+		allSnippets = append(allSnippets, s)
+	}
+
+	return allSnippets, nil
+}
