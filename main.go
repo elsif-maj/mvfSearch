@@ -1,20 +1,14 @@
 package main
 
 import (
-	// std
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
-	"time"
 
-	// dependencies
-	"github.com/jackc/pgx/v5"
-	// local imports
+	"github.com/elsif-maj/umbraSearch/db"
 	"github.com/elsif-maj/umbraSearch/myEnv"
-	"github.com/elsif-maj/umbraSearch/tokenizer"
 )
 
 type User struct {
@@ -26,35 +20,15 @@ func main() {
 	myEnv.SetEnv()
 
 	// DB
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DB_CONN_STR"))
+	db, err := db.ConnectDB()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
-	defer conn.Close(context.Background())
-
-	queryResult, err := conn.Query(context.Background(), "select * from \"Snippets\"")
-	// queryResult, err := conn.Query(context.Background(), "select * from public.\"Snippets\"")
-	if err != nil {
-		log.Fatal("Error with DB Query: ", err)
-	}
-
-	// Clean this up tomorrow
-	var col2, col3, col4 string
-	var col1, col5 int
-	var col6, col7 time.Time
-
-	for queryResult.Next() {
-		err = queryResult.Scan(&col1, &col2, &col3, &col4, &col5, &col6, &col7)
-		if err != nil {
-			fmt.Println("Problem with queryResult.Scan() step: ", err)
-			break
-		}
-		fmt.Println("Result from PG Database Query: ", col2) //col1, col2, col3, col4, col5, col6, col7)
-	}
+	defer db.Close(context.Background())
 
 	// Test & Temp
-	fmt.Println(tokenizer.Tokenize("Tokenize this bro! testing what's beyond the punctuation..."))
+	// fmt.Println(tokenizer.Tokenize("Test token. Also: Testing what's beyond the punctuation..."))
 
 	http.HandleFunc("/", makeAPIFunc(handleHome))         // Placeholder/Test route
 	http.HandleFunc("/api/user", makeAPIFunc(handleUser)) // Placeholder/Test route
