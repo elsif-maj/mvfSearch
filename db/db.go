@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -20,9 +21,27 @@ func ConnectDB() (*pgx.Conn, error) {
 	return conn, nil
 }
 
-// Do I need to return an error here?
+func GetSnippet(db *pgx.Conn, id int) (models.Snippet, error) {
+	var s models.Snippet
+
+	queryResult := db.QueryRow(
+		context.Background(),
+		"SELECT * FROM \"Snippets\" WHERE id=$1",
+		id,
+	)
+
+	err := queryResult.Scan(&s.Id, &s.Title, &s.Language, &s.Code, &s.UserId, &s.Created_at, &s.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return s, fmt.Errorf("No snippet found with ID %d", id)
+		}
+		return s, fmt.Errorf("Error with DB Query: %v", err)
+	}
+	return s, nil
+}
+
 func GetAllSnippets(db *pgx.Conn) ([]models.Snippet, error) {
-	queryResult, err := db.Query(context.Background(), "select * from \"Snippets\"")
+	queryResult, err := db.Query(context.Background(), "SELECT * FROM \"Snippets\"")
 	if err != nil {
 		return nil, fmt.Errorf("Error with DB Query: %v", err)
 	}

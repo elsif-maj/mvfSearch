@@ -35,7 +35,8 @@ func main() {
 	}
 
 	// Routes
-	http.HandleFunc("/api/snippets", makeAPIFunc(app.handleSnippets)) // Placeholder/Test route
+	http.HandleFunc("/api/snippets", makeAPIFunc(app.handleSnippets))       // Placeholder/Test route
+	http.HandleFunc("/api/snippets/new", makeAPIFunc(app.handleNewSnippet)) // Placeholder/Test route
 
 	// Main Server Loop
 	http.ListenAndServe(":3000", nil)
@@ -62,4 +63,33 @@ func (app *App) handleSnippets(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return writeJSON(w, http.StatusOK, snippets)
+}
+
+// Takes an incoming snippet id ("id"), used to look up the newly created snippet in DB and process it for tokenization/ngramification/indexing.
+// test: curl -X POST -H "Content-Type: application/json" -d '{"id":16}' http://localhost:3000/api/snippets/new
+func (app *App) handleNewSnippet(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != "POST" {
+		return writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "Method not allowed"})
+	}
+
+	var data map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		return fmt.Errorf("Problem with decoding request body: %v", err)
+	}
+
+	id, ok := data["id"].(float64)
+	if !ok {
+		return fmt.Errorf("Invalid or missing 'id' in request body JSON object")
+	}
+
+	snippetId := int(id)
+
+	fmt.Println(snippetId)
+	// fmt.Println(db.GetSnippet(app.DBConn, 16))
+
+	// async DB query to grab the snippet payload of ID?
+	// func call here
+
+	return writeJSON(w, http.StatusOK, map[string]string{"Success": "The creation of snippet with DB primary key id: [interpolate id here] has been registered."})
 }
