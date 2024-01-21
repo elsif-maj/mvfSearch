@@ -91,5 +91,5 @@ func (app *App) handleNewSnippet(w http.ResponseWriter, r *http.Request) error {
 	// async DB query to grab the snippet payload of ID?
 	// func call here
 
-	return writeJSON(w, http.StatusOK, map[string]string{"Success": "The creation of snippet with DB primary key id: [interpolate id here] has been registered."})
+	return writeJSON(w, http.StatusOK, map[string]string{"Success": fmt.Sprintf("The creation of snippet with DB primary key id: %d has been registered.", snippetId)})
 }
