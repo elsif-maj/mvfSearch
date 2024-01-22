@@ -30,7 +30,7 @@ func GetSnippet(dbconn *pgx.Conn, id int) (models.Snippet, error) {
 		id,
 	)
 
-	err := queryResult.Scan(&s.Id, &s.Title, &s.Language, &s.Code, &s.UserId, &s.Created_at, &s.UpdatedAt)
+	err := queryResult.Scan(&s.Id, &s.Title, &s.Language, &s.Code, &s.UserId, &s.CreatedAt, &s.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return s, fmt.Errorf("No snippet found with ID %d", id)
@@ -54,7 +54,7 @@ func GetAllSnippets(db *pgx.Conn) ([]models.Snippet, error) {
 
 	for queryResult.Next() {
 		var s models.Snippet
-		err = queryResult.Scan(&s.Id, &s.Title, &s.Language, &s.Code, &s.UserId, &s.Created_at, &s.UpdatedAt)
+		err = queryResult.Scan(&s.Id, &s.Title, &s.Language, &s.Code, &s.UserId, &s.CreatedAt, &s.UpdatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("Problem with queryResult.Scan() step: %v", err)
 		}
