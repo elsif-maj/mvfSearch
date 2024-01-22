@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/elsif-maj/umbraSearch/db"
+	"github.com/elsif-maj/umbraSearch/indexer"
 	"github.com/elsif-maj/umbraSearch/myEnv"
 	"github.com/jackc/pgx/v5"
 )
@@ -57,8 +58,8 @@ func (app *Server) HandleSnippets(w http.ResponseWriter, r *http.Request) error 
 	return writeJSON(w, http.StatusOK, snippets)
 }
 
-// Takes an incoming snippet id ("id"), used to look up the newly created snippet in DB and process it for tokenization/ngramification/indexing.
-// test: curl -X POST -H "Content-Type: application/json" -d '{"id":16}' http://localhost:3000/api/snippets/new
+// Test:
+// curl -X POST -H "Content-Type: application/json" -d '{"id":16}' http://localhost:3000/api/snippets/new
 func (app *Server) HandleNewSnippet(w http.ResponseWriter, r *http.Request) error {
 	if r.Method != "POST" {
 		return writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "Method not allowed"})
@@ -77,13 +78,7 @@ func (app *Server) HandleNewSnippet(w http.ResponseWriter, r *http.Request) erro
 
 	snippetId := int(id)
 
-	// tokenizer.Tokenize(app, snippetId)
-
-	fmt.Println(snippetId)
-	// fmt.Println(db.GetSnippet(app.DBConn, 16))
-
-	// async DB query to grab the snippet payload of ID?
-	// func call here
+	indexer.ProcessInput(app.DBConn, snippetId)
 
 	return writeJSON(w, http.StatusOK, map[string]string{"Success": fmt.Sprintf("The creation of snippet with DB primary key id: %d has been registered.", snippetId)})
 }
