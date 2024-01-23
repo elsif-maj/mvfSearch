@@ -21,10 +21,10 @@ func ConnectDB() (*pgx.Conn, error) {
 	return conn, nil
 }
 
-func GetSnippet(dbconn *pgx.Conn, id int) (models.Snippet, error) {
+func GetSnippet(db *pgx.Conn, id int) (models.Snippet, error) {
 	var s models.Snippet
 
-	queryResult := dbconn.QueryRow(
+	queryResult := db.QueryRow(
 		context.Background(),
 		"SELECT * FROM \"Snippets\" WHERE id=$1",
 		id,

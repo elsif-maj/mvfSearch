@@ -13,8 +13,7 @@ import (
 )
 
 type Server struct {
-	DevTestIndex map[string][]int // Development data structure for testing routes, tokenization, n-gramification, etc.
-	DBConn       *pgx.Conn
+	DBConn *pgx.Conn
 }
 
 type apiFunc func(http.ResponseWriter, *http.Request) error
@@ -84,7 +83,7 @@ func (app *Server) HandleNewSnippet(w http.ResponseWriter, r *http.Request) erro
 	snippetId := int(id)
 
 	go func() {
-		if err := flows.ProcessInput(app, snippetId); err != nil {
+		if err := flows.ProcessInputAsWords(app, snippetId); err != nil {
 			log.Printf("Failed to process input: %v", err)
 		}
 	}()

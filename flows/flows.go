@@ -12,20 +12,33 @@ type Server interface {
 	GetDBConn() *pgx.Conn
 }
 
-func ProcessInput(server Server, id int) error {
+func ProcessInputAsWords(server Server, id int) error {
 	// Get snippet from database
 	snippet, err := db.GetSnippet(server.GetDBConn(), id)
 	if err != nil {
 		return fmt.Errorf("failed to get snippet from database: %w", err)
 	}
 
-	// Tokenize snippet -- come back to this and add the title
-	i, err := indexing.Tokenize(snippet.Code)
+	// Tokenize words from snippet -- come back to this and add the title
+	i, err := indexing.TokenizeWords(snippet.Code)
 	if err != nil {
 		return fmt.Errorf("failed to tokenize snippet id: %d", id)
 	}
 
-	fmt.Println(i)
+	// (t)okens and (n)gram(s) slice (tns) will be a step-by-step 'running total' slice of tokens and ngrams that is appended-to each step of the way
+	// (i) will remain unchanged as a reference of the word tokens
+	tns := []string(i)
+
+	// Make word-Ngrams from word tokens
+	tns, err = indexing.MakeWordNgrams(i, tns, 3)
+	if err != nil {
+		return fmt.Errorf("failed to tokenize snippet id: %d", id)
+	}
+
+	//
+	// fmt.Println("Word Tokens: ", i)
+	// fmt.Println("Word Tokens AND ngrams: ", tns)
+
 	/*
 		What might be next?
 
