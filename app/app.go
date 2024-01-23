@@ -3,10 +3,11 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/elsif-maj/umbraSearch/db"
-	"github.com/elsif-maj/umbraSearch/indexer"
+	"github.com/elsif-maj/umbraSearch/flows"
 	"github.com/elsif-maj/umbraSearch/myEnv"
 	"github.com/jackc/pgx/v5"
 )
@@ -17,6 +18,10 @@ type Server struct {
 }
 
 type apiFunc func(http.ResponseWriter, *http.Request) error
+
+func (s *Server) GetDBConn() *pgx.Conn {
+	return s.DBConn
+}
 
 func Setup() (*Server, error) {
 	// Set environment variables if needed
@@ -78,7 +83,11 @@ func (app *Server) HandleNewSnippet(w http.ResponseWriter, r *http.Request) erro
 
 	snippetId := int(id)
 
-	indexer.ProcessInput(app.DBConn, snippetId)
+	go func() {
+		if err := flows.ProcessInput(app, snippetId); err != nil {
+			log.Printf("Failed to process input: %v", err)
+		}
+	}()
 
 	return writeJSON(w, http.StatusOK, map[string]string{"Success": fmt.Sprintf("The creation of snippet with DB primary key id: %d has been registered.", snippetId)})
 }

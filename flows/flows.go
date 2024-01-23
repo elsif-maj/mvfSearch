@@ -1,24 +1,26 @@
-package indexer
+package flows
 
 import (
-	"errors"
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/elsif-maj/umbraSearch/db"
+	"github.com/elsif-maj/umbraSearch/indexing"
 	"github.com/jackc/pgx/v5"
 )
 
-func ProcessInput(dbconn *pgx.Conn, id int) error {
+type Server interface {
+	GetDBConn() *pgx.Conn
+}
+
+func ProcessInput(server Server, id int) error {
 	// Get snippet from database
-	snippet, err := db.GetSnippet(dbconn, id)
+	snippet, err := db.GetSnippet(server.GetDBConn(), id)
 	if err != nil {
 		return fmt.Errorf("failed to get snippet from database: %w", err)
 	}
 
 	// Tokenize snippet -- come back to this and add the title
-	i, err := tokenize(snippet.Code)
+	i, err := indexing.Tokenize(snippet.Code)
 	if err != nil {
 		return fmt.Errorf("failed to tokenize snippet id: %d", id)
 	}
@@ -32,14 +34,4 @@ func ProcessInput(dbconn *pgx.Conn, id int) error {
 		3) Loading result into a reverse index
 	*/
 	return nil
-}
-
-func tokenize(i string) ([]string, error) {
-	i = strings.ToLower(i)
-	tR, err := regexp.Compile("[^a-z0-9_'-]+") // perhaps we should iterate through with a more specific ruleset.
-	if err != nil {
-		return nil, errors.New("failed to compile the tokenizer regular expression")
-	}
-
-	return tR.Split(i, -1), nil
 }
