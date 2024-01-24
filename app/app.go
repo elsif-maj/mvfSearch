@@ -8,18 +8,24 @@ import (
 
 	"github.com/elsif-maj/umbraSearch/db"
 	"github.com/elsif-maj/umbraSearch/flows"
+	"github.com/elsif-maj/umbraSearch/kvstore"
 	"github.com/elsif-maj/umbraSearch/myEnv"
 	"github.com/jackc/pgx/v5"
 )
 
 type Server struct {
 	DBConn *pgx.Conn
+	KVConn kvstore.KVStore
 }
 
 type apiFunc func(http.ResponseWriter, *http.Request) error
 
 func (s *Server) GetDBConn() *pgx.Conn {
 	return s.DBConn
+}
+
+func (s *Server) GetKVStore() kvstore.KVStore {
+	return s.KVConn
 }
 
 func Setup() (*Server, error) {
@@ -35,6 +41,11 @@ func Setup() (*Server, error) {
 	app := &Server{
 		DBConn: dbConn,
 	}
+
+	// Connect to Key-Value store
+	kvConn := kvstore.ConnectRedis()
+	// error handling
+	app.KVConn = kvConn
 
 	return app, nil
 }
