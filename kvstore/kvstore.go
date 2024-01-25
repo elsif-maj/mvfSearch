@@ -10,6 +10,7 @@ type KVStore interface {
 	Set(key string, value string) error
 	Get(key string) (string, error)
 	Delete(key string) error
+	Close() error
 }
 
 type RedisStore struct {
@@ -45,4 +46,8 @@ func (r *RedisStore) Get(key string) (string, error) {
 func (r *RedisStore) Delete(key string) error {
 	// Implement using Redis client
 	return nil
+}
+
+func (r *RedisStore) Close() error {
+	return r.client.Close()
 }

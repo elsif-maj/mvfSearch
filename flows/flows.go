@@ -41,6 +41,7 @@ func ProcessInputAsWords(server Server, id int) error {
 	// Test access to key-value store
 	kvstore := server.GetKVStore()
 	kvstore.Set("testKey", "testValue")
+	fmt.Println(kvstore.Get("testKey"))
 
 	// fmt.Println("Word Tokens: ", i)
 	// fmt.Println("Word Tokens AND ngrams: ", tns)

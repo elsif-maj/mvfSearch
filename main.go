@@ -18,7 +18,7 @@ func main() {
 		os.Exit(1)
 	}
 	defer server.DBConn.Close(context.Background())
-
+	defer server.KVConn.Close()
 	// Routes
 	handler.SetupRoutes(server)
 	// Server Loop
