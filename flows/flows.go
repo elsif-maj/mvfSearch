@@ -15,17 +15,19 @@ type Server interface {
 }
 
 // Still need to figure out where stop-word removal is going to happen
-func ProcessInputAsWords(server Server, id int) error {
+func ProcessInputAsWords(server Server, snippetId int) error {
 	// Get snippet from database
-	snippet, err := db.GetSnippet(server.GetDBConn(), id)
+	snippet, err := db.GetSnippet(server.GetDBConn(), snippetId)
 	if err != nil {
 		return fmt.Errorf("failed to get snippet from database: %w", err)
 	}
 
+	userId := snippet.UserId
+
 	// Tokenize words from snippet -- come back to this and add the title
 	i, err := indexing.TokenizeWords(snippet.Code)
 	if err != nil {
-		return fmt.Errorf("failed to tokenize snippet id: %d", id)
+		return fmt.Errorf("failed to tokenize snippet snippetId: %d", snippetId)
 	}
 
 	// (t)okens and (n)gram(s) slice (tns) will be a step-by-step 'running total' slice of tokens and ngrams that is appended-to each step of the way
@@ -35,10 +37,10 @@ func ProcessInputAsWords(server Server, id int) error {
 	// Make word-Ngrams from word tokens
 	tns, err = indexing.MakeWordNgrams(i, tns, 3)
 	if err != nil {
-		return fmt.Errorf("failed to tokenize snippet id: %d", id)
+		return fmt.Errorf("failed to tokenize snippet snippetId: %d", snippetId)
 	}
 
-	err = AddAllKeysToKVStore(server, tns, id)
+	err = AddAllKeysToKVStore(server, tns, userId, snippetId)
 	if err != nil {
 		return fmt.Errorf("failed to add key(s) to key-value store, error: %w", err)
 	}
@@ -46,12 +48,11 @@ func ProcessInputAsWords(server Server, id int) error {
 	return nil
 }
 
-func AddAllKeysToKVStore(server Server, tns []string, id int) error {
+func AddAllKeysToKVStore(server Server, tns []string, userId string, snippetId int) error {
 	kvstore := server.GetKVStore()
 
 	for i := 0; i < len(tns); i++ {
-		// err := kvstore.Set(tns[i], strconv.Itoa(id))
-		err := kvstore.SAdd(tns[i], id)
+		err := kvstore.SAdd(userId, tns[i], snippetId)
 		if err != nil {
 			return fmt.Errorf("failed to add key(s) to key-value store, error: %w", err)
 		}

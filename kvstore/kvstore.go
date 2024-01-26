@@ -10,7 +10,7 @@ import (
 
 type KVStore interface {
 	Set(key string, value int) error
-	SAdd(key string, value int) error
+	SAdd(userId string, searchterm string, docId int) error
 	Get(key string) error
 	Delete(key string) error
 	Close() error
@@ -22,6 +22,7 @@ type RedisStore struct {
 
 // come back to this and look at alternate methods and error handling...
 // https://redis.io/docs/connect/clients/go/
+// extract to env
 func ConnectRedis() *RedisStore {
 	c := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -36,6 +37,7 @@ func ConnectRedis() *RedisStore {
 	}
 }
 
+// change this to look like SAdd
 func (r *RedisStore) Set(key string, value int) error {
 	strDocId := strconv.Itoa(value)
 	err := r.client.Set(context.Background(), strDocId, value, 0).Err()
@@ -45,8 +47,10 @@ func (r *RedisStore) Set(key string, value int) error {
 	return nil
 }
 
-func (r *RedisStore) SAdd(key string, value int) error {
-	strDocId := strconv.Itoa(value)
+func (r *RedisStore) SAdd(userId string, searchterm string, docId int) error {
+	key := fmt.Sprintf("user:%s:search:%s", userId, searchterm)
+	strDocId := strconv.Itoa(docId)
+
 	err := r.client.SAdd(context.Background(), key, strDocId).Err()
 	if err != nil {
 		return err
