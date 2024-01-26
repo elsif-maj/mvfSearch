@@ -1,14 +1,17 @@
 package kvstore
 
 import (
+	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/redis/go-redis/v9"
 )
 
 type KVStore interface {
-	Set(key string, value string) error
-	Get(key string) (string, error)
+	Set(key string, value int) error
+	SAdd(key string, value int) error
+	Get(key string) error
 	Delete(key string) error
 	Close() error
 }
@@ -26,25 +29,46 @@ func ConnectRedis() *RedisStore {
 		DB:       0,
 	})
 
-	fmt.Println(c)
+	fmt.Println(c.Ping(context.Background()))
 
 	return &RedisStore{
 		client: c,
 	}
 }
 
-func (r *RedisStore) Set(key string, value string) error {
-	// Implement using Redis client
+func (r *RedisStore) Set(key string, value int) error {
+	strDocId := strconv.Itoa(value)
+	err := r.client.Set(context.Background(), strDocId, value, 0).Err()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (r *RedisStore) Get(key string) (string, error) {
-	// Implement using Redis client
-	return "test", nil
+func (r *RedisStore) SAdd(key string, value int) error {
+	strDocId := strconv.Itoa(value)
+	err := r.client.SAdd(context.Background(), key, strDocId).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RedisStore) Get(key string) error {
+	// strKey := strconv.Itoa(key)
+	return nil
+}
+
+func (r *RedisStore) SMembers(key string) ([]string, error) {
+	result, err := r.client.SMembers(context.Background(), key).Result()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (r *RedisStore) Delete(key string) error {
-	// Implement using Redis client
+	// strKey := strconv.Itoa(key)
 	return nil
 }
 

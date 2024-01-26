@@ -38,12 +38,23 @@ func ProcessInputAsWords(server Server, id int) error {
 		return fmt.Errorf("failed to tokenize snippet id: %d", id)
 	}
 
-	// Test access to key-value store
-	kvstore := server.GetKVStore()
-	kvstore.Set("testKey", "testValue")
-	fmt.Println(kvstore.Get("testKey"))
+	err = AddAllKeysToKVStore(server, tns, id)
+	if err != nil {
+		return fmt.Errorf("failed to add key(s) to key-value store, error: %w", err)
+	}
 
-	// fmt.Println("Word Tokens: ", i)
-	// fmt.Println("Word Tokens AND ngrams: ", tns)
+	return nil
+}
+
+func AddAllKeysToKVStore(server Server, tns []string, id int) error {
+	kvstore := server.GetKVStore()
+
+	for i := 0; i < len(tns); i++ {
+		// err := kvstore.Set(tns[i], strconv.Itoa(id))
+		err := kvstore.SAdd(tns[i], id)
+		if err != nil {
+			return fmt.Errorf("failed to add key(s) to key-value store, error: %w", err)
+		}
+	}
 	return nil
 }
