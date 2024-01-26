@@ -17,3 +17,5 @@ All that being said, I'm going to at least start keeping in this readme a list o
 -Consider what API design should be for a more app-neutral service (i.e. generalizing away from plugging this in to Umbra)
 
 -Prefix search?
+
+-Set up env/secrets for Redis connection
