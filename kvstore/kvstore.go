@@ -12,6 +12,7 @@ type KVStore interface {
 	Set(key string, value int) error
 	SAdd(userId string, searchterm string, docId int) error
 	Get(key string) error
+	SMembers(userId string, searchterm string) ([]string, error)
 	Delete(key string) error
 	Close() error
 }
@@ -63,7 +64,9 @@ func (r *RedisStore) Get(key string) error {
 	return nil
 }
 
-func (r *RedisStore) SMembers(key string) ([]string, error) {
+func (r *RedisStore) SMembers(userId string, searchterm string) ([]string, error) {
+	key := fmt.Sprintf("user:%s:search:%s", userId, searchterm)
+
 	result, err := r.client.SMembers(context.Background(), key).Result()
 	if err != nil {
 		return nil, err

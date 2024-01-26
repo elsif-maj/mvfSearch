@@ -59,3 +59,14 @@ func AddAllKeysToKVStore(server Server, tns []string, userId string, snippetId i
 	}
 	return nil
 }
+
+// int slice?  JSON encoding?
+func Search(server Server, userId string, searchString string) ([]string, error) {
+	kvstore := server.GetKVStore()
+
+	docs, err := kvstore.SMembers(userId, searchString)
+	if err != nil {
+		return nil, fmt.Errorf("failed to search the index: %w", err)
+	}
+	return docs, nil
+}
