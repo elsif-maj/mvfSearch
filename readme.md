@@ -1,5 +1,6 @@
 # Readme
 
+1/26/24
 Alright, alright. I really need to start documenting things -- really! I'm filled with admiration for the lovely docs that I've been seeing now that I have more time to browse through projects on GitHub. I'd like to follow suit. 2024 is the year of docs. And tests.
 
 But that day is not today. I'm still hacking away on this exploratory project, and there is much to do before committing any words to a page about what the *state of things* is. I can, however, now grab docId search term matches at the word level and higher -- ngrams of words as well. O(1) btw -- nbd.
