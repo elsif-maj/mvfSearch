@@ -9,6 +9,10 @@ There is still a fair bit of Go noobishness to be cleaned up. Error handling and
 
 All that being said, I'm going to at least start keeping in this readme a list of stuff that I'd like to keep an awareness of as I continue to work:
 
+-Tests
+
+-Docs
+
 -API Keys
 
 -Standardization of naming for functions/parameters/variables
