@@ -1,26 +1,33 @@
 # Readme
 
-1/26/24
-Alright, alright. I really need to start documenting things -- really! I'm filled with admiration for the lovely docs that I've been seeing now that I have more time to browse through projects on GitHub. I'd like to follow suit. 2024 is the year of docs. And tests.
+This app is currently aimed at being integrated with Umbra ( https://github.com/elsif-maj/Umbra-VPS-Deployment ), but I will eventually generalize the APIs and offer configurability for it to be as broadly applicable as I can make it.
 
-But that day is not today. I'm still hacking away on this exploratory project, and there is much to do before committing any words to a page about what the *state of things* is. I can, however, now grab docId search term matches at the word level and higher -- ngrams of words as well. O(1) btw -- nbd.
+At present the app will take primary keys of documents containing text in a database, ingest the text content, and route it through a tokenization and ngram-ification process. The resultant string arrays can then be processed in a way that they are fed into Redis (although I am looking to make this interface generalized) to create a reverse index which maps keys that include user IDs, concatenated with the tokens and ngrams to the document IDs (or primary keys) from which they were generated, leading to one large K-V store with all tokens and token ngrams (from length 2 to 5 currently) from all documents in the database being look-up-able in 0(1) time in a way that is indexed to the users who are associated with the documents. If one pipes all relevant documents through this process the result is individualized full text search (yielding document ID), indexed per user, for all words and sequences of words (from 2 to 5) that show up in their documents.
 
-There is still a fair bit of Go noobishness to be cleaned up. Error handling and package proliferation are setting off alarm bells for me -- and that's just stuff I know enough to recognize. The API is untouched since day 1, and there was no plan for it on day 1.
+A list of stuff that I'd like to keep an awareness of as I continue to work:
 
-All that being said, I'm going to at least start keeping in this readme a list of stuff that I'd like to keep an awareness of as I continue to work:
 
--Tests
+-Fix error handling
 
--Docs
+-Add stop word removal in the indexing flows
 
 -API Keys
 
 -Standardization of naming for functions/parameters/variables
 
--Add stop word removal in the indexing flows
+-Set up env/secrets for Redis connection
+
+-Tests
+
+-Docs
 
 -Consider what API design should be for a more app-neutral service (i.e. generalizing away from plugging this in to Umbra)
 
+-Consolidate packages 
+
 -Prefix search?
 
--Set up env/secrets for Redis connection
+
+
+
+
