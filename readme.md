@@ -25,7 +25,7 @@ A list of stuff that I'd like to keep an awareness of as I continue to work:
 
 -Consolidate packages 
 
--Prefix search?
+-Add to the readme regarding the tradeoffs of supporting prefix search
 
 
 
